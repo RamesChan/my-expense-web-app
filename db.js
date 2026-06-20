@@ -13,17 +13,7 @@ function getClient() {
 // 1. หมวดหมู่ (Categories)
 // =========================================================================
 
-// รายการหมวดหมู่เริ่มต้นกรณีผู้ใช้สมัครใหม่
-const DEFAULT_CATEGORIES = [
-    { name: "อาหารและเครื่องดื่ม", icon: "🍔", color: "rose-500", budget: 5000 },
-    { name: "การเดินทาง", icon: "🚗", color: "blue-500", budget: 3000 },
-    { name: "ความบันเทิง", icon: "🎬", color: "yellow-500", budget: 2000 },
-    { name: "ของใช้ในบ้าน", icon: "🏠", color: "purple-500", budget: 4000 },
-    { name: "ช้อปปิ้ง", icon: "🛍️", color: "pink-500", budget: 2000 },
-    { name: "รายได้ประจำ", icon: "💰", color: "emerald-500", budget: 0 } // สำหรับรายรับ
-];
-
-// ดึงหมวดหมู่ทั้งหมดของผู้ใช้งานปัจจุบัน
+// ดึงหมวดหมู่ทั้งหมดของผู้ใช้งานปัจจุบัน (ผู้ใช้ใหม่จะได้รับ array ว่าง ไม่มีการสร้างหมวดหมู่อัตโนมัติ)
 export async function getCategories() {
     const supabase = getClient();
     const user = (await supabase.auth.getUser()).data.user;
@@ -36,37 +26,9 @@ export async function getCategories() {
         .order('created_at', { ascending: true });
 
     if (error) throw error;
-
-    // ถ้ายังไม่มีหมวดหมู่เลย ให้เริ่มสร้างหมวดหมู่เริ่มต้น
-    if (data.length === 0) {
-        return await initializeDefaultCategories(user.id);
-    }
-
     return data;
 }
 
-// สร้างหมวดหมู่เริ่มต้นให้กับผู้ใช้
-async function initializeDefaultCategories(userId) {
-    const supabase = getClient();
-    const categoriesToInsert = DEFAULT_CATEGORIES.map(cat => ({
-        user_id: userId,
-        name: cat.name,
-        icon: cat.icon,
-        color: cat.color,
-        budget: cat.budget
-    }));
-
-    const { data, error } = await supabase
-        .from('categories')
-        .insert(categoriesToInsert)
-        .select();
-
-    if (error) {
-        console.error("Error creating default categories:", error);
-        return [];
-    }
-    return data;
-}
 
 // สร้างหมวดหมู่ใหม่
 export async function createCategory(name, icon, color, budget) {

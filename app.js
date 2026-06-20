@@ -729,21 +729,33 @@ function renderCategories() {
     const gridEl = document.getElementById("categories-grid");
     gridEl.innerHTML = "";
 
-    state.categories.forEach(cat => {
-        const item = document.createElement("div");
-        item.className = "bg-white p-4 border border-slate-100 rounded-xl shadow-sm text-center relative group hover:bg-slate-50 transition-all cursor-pointer";
-        item.innerHTML = `
-            <span class="text-2xl block mb-1">${cat.icon}</span>
-            <p class="text-xs font-semibold text-slate-700">${cat.name}</p>
-            <p class="text-[10px] text-slate-400 mt-1">${cat.budget > 0 ? `งบ: ฿${cat.budget.toLocaleString()}` : 'ไม่มีงบประมาณ'}</p>
-            
-            <!-- ปุ่มแก้ไขหมวดหมู่ -->
-            <button data-id="${cat.id}" class="btn-edit-category absolute top-2 right-2 text-slate-300 hover:text-indigo-600 text-[10px] opacity-0 group-hover:opacity-100 transition-all w-5 h-5 rounded-full hover:bg-slate-100 flex items-center justify-center">
-                <i class="fa-solid fa-pen"></i>
-            </button>
+    if (state.categories.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "col-span-2 p-8 text-center text-xs text-slate-400 bg-white border border-slate-100 rounded-2xl";
+        empty.innerHTML = `
+            <span class="text-3xl block mb-2">📂</span>
+            <p class="font-medium text-slate-500 mb-1">ยังไม่มีหมวดหมู่</p>
+            <p class="font-light">กดปุ่ม "+ เพิ่มหมวดหมู่ใหม่" ด้านบนเพื่อเริ่มสร้าง</p>
         `;
-        gridEl.appendChild(item);
-    });
+        gridEl.appendChild(empty);
+    } else {
+        state.categories.forEach(cat => {
+            const item = document.createElement("div");
+            item.className = "bg-white p-4 border border-slate-100 rounded-xl shadow-sm text-center relative group hover:bg-indigo-50 hover:border-indigo-200 transition-all cursor-pointer";
+            item.innerHTML = `
+                <span class="text-2xl block mb-1">${cat.icon}</span>
+                <p class="text-xs font-semibold text-slate-700">${cat.name}</p>
+                <p class="text-[10px] text-slate-400 mt-1">${cat.budget > 0 ? `งบ: ฿${cat.budget.toLocaleString()}` : 'ไม่มีงบประมาณ'}</p>
+                <!-- ไอคอนดินสอ แสดงตอน hover -->
+                <div class="absolute top-2 right-2 text-slate-300 group-hover:text-indigo-400 transition-all">
+                    <i class="fa-solid fa-pen text-[9px]"></i>
+                </div>
+            `;
+            // ผูก onclick ทั้งการ์ดด้วย JS โดยตรง (ไม่ใช่ innerHTML) เพื่อให้ทำงานได้แน่นอน
+            item.onclick = () => window.openCategoryModal(cat);
+            gridEl.appendChild(item);
+        });
+    }
 
     // ปุ่มสร้างหมวดหมู่ใหม่แบบ Grid
     const addCard = document.createElement("div");
@@ -754,18 +766,6 @@ function renderCategories() {
     `;
     addCard.onclick = () => window.openCategoryModal();
     gridEl.appendChild(addCard);
-
-    // ลิงก์แก้ไขหมวดหมู่
-    document.querySelectorAll(".btn-edit-category").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const id = btn.getAttribute("data-id");
-            const cat = state.categories.find(c => c.id === id);
-            if (cat) {
-                window.openCategoryModal(cat);
-            }
-        });
-    });
 }
 
 // อัปเดตข้อมูลหน้าตั้งค่า Page 4

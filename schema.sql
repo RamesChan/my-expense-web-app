@@ -57,6 +57,16 @@ CREATE TABLE IF NOT EXISTS public.fixed_expense_logs (
     UNIQUE (fixed_expense_id, month_year)
 );
 
+-- 6. สร้างตาราง Monthly Budgets (เป้ารายรับประจำเดือนสำหรับใช้วางแผน)
+CREATE TABLE IF NOT EXISTS public.monthly_budgets (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+    month_year TEXT NOT NULL, -- เช่น '2026-06'
+    income_goal NUMERIC DEFAULT 0 NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    UNIQUE (user_id, month_year)
+);
+
 -- =========================================================================
 -- ตั้งค่า Row Level Security (RLS) เพื่อรักษาความปลอดภัยของข้อมูล
 -- =========================================================================
@@ -67,6 +77,7 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fixed_expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fixed_expense_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.monthly_budgets ENABLE ROW LEVEL SECURITY;
 
 -- นโยบายสิทธิ์ (Policies) ของตาราง Profiles
 CREATE POLICY "Users can view their own profile" ON public.profiles
@@ -92,6 +103,10 @@ CREATE POLICY "Users can manage their own fixed expenses" ON public.fixed_expens
 
 -- นโยบายสิทธิ์ (Policies) ของตาราง Fixed Expense Logs
 CREATE POLICY "Users can manage their own fixed expense logs" ON public.fixed_expense_logs
+    FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- นโยบายสิทธิ์ (Policies) ของตาราง Monthly Budgets
+CREATE POLICY "Users can manage their own monthly budgets" ON public.monthly_budgets
     FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- =========================================================================

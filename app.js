@@ -2,7 +2,7 @@
 // ตัวควบคุมการแสดงผลของ UI, กราฟ, การทำระบบล็อกอิน และเชื่อมต่อฐานข้อมูลทั้งหมด
 import { isConfigured, saveSupabaseConfig, clearSupabaseConfig, getSupabaseConfig } from './config.js';
 import { signUp, signIn, signOut, getCurrentUser, getCurrentProfile, updateProfileDisplayName, subscribeToAuthChanges, resetSupabaseClient } from './auth.js';
-import { getCategories, createCategory, updateCategory, deleteCategory, getTransactions, createTransaction, deleteTransaction, getFixedExpenses, createFixedExpense, deleteFixedExpense, checkAndApplyFixedExpenses } from './db.js';
+import { getCategories, createCategory, updateCategory, deleteCategory, getTransactions, createTransaction, deleteTransaction, getFixedExpenses, createFixedExpense, deleteFixedExpense, checkAndApplyFixedExpenses, getMonthlyBudget, upsertMonthlyBudget } from './db.js';
 
 // =========================================================================
 // สถานะแอปพลิเคชัน (Application State)
@@ -13,6 +13,7 @@ let state = {
     categories: [],
     transactions: [],
     fixedExpenses: [],
+    monthlyBudget: { income_goal: 0 },
     selectedMonth: "", // YYYY-MM
     activeTab: "dashboard",
     activeAuthTab: "login", // login | signup
@@ -23,7 +24,8 @@ let state = {
     selectedFixedCategoryId: null,
     selectedCategoryColor: "rose-500", // สีหมวดหมู่เริ่มต้น
     editingCategoryId: null, // ID หมวดหมู่ที่กำลังแก้ไข (ถ้ามี)
-    chartInstance: null
+    chartInstance: null,
+    planChartInstance: null
 };
 
 // =========================================================================
@@ -159,9 +161,11 @@ async function loadAllData() {
         state.categories = await getCategories();
         state.transactions = await getTransactions({ monthYear: state.selectedMonth });
         state.fixedExpenses = await getFixedExpenses();
+        state.monthlyBudget = await getMonthlyBudget(state.selectedMonth);
 
         // 3. เรนเดอร์ UI
         renderDashboard();
+        renderPlanSection();
         renderFixedExpenses();
         renderCategories();
         renderSettingsPage();
@@ -417,7 +421,8 @@ function renderCategoryBudgets(totalSpent) {
         let isOver = spent > budget && budget > 0;
 
         const card = document.createElement("div");
-        card.className = "bg-white border border-slate-100 rounded-xl p-3.5 shadow-sm";
+        card.className = "bg-white border border-slate-100 rounded-xl p-3.5 shadow-sm cursor-pointer hover:bg-slate-50 transition-all";
+        card.onclick = () => window.openCategoryModalById(cat.id);
         card.innerHTML = `
             <div class="flex justify-between items-center mb-2">
                 <div class="flex items-center space-x-3">
@@ -452,6 +457,143 @@ function renderCategoryBudgets(totalSpent) {
         `;
         listEl.appendChild(card);
     });
+}
+
+// เรนเดอร์การวางแผนรายรับรายจ่ายประจำเดือน
+function renderPlanSection() {
+    const plannedIncome = parseFloat(state.monthlyBudget?.income_goal) || 0;
+    
+    // คำนวณแผนรายจ่ายรวม (ผลรวมงบประมาณรายหมวดหมู่)
+    const totalPlannedExpense = state.categories.reduce((acc, cat) => acc + (parseFloat(cat.budget) || 0), 0);
+    
+    const plannedSavings = plannedIncome - totalPlannedExpense;
+
+    // อัปเดต UI ตัวเลข
+    document.getElementById("plan-income-val").textContent = `฿${plannedIncome.toLocaleString()}`;
+    document.getElementById("plan-expense-val").textContent = `฿${totalPlannedExpense.toLocaleString()}`;
+    
+    const savingsEl = document.getElementById("plan-savings-val");
+    savingsEl.textContent = `฿${plannedSavings.toLocaleString()}`;
+    
+    if (plannedSavings < 0) {
+        savingsEl.className = "font-bold text-rose-500";
+    } else {
+        savingsEl.className = "font-bold text-indigo-600";
+    }
+
+    // วาดกราฟแผนการเงินด้วย Chart.js
+    const ctx = document.getElementById('planChart').getContext('2d');
+    const legendEl = document.getElementById("plan-chart-legend");
+    legendEl.innerHTML = "";
+
+    // ล้างกราฟเก่าออกก่อน
+    if (state.planChartInstance) {
+        state.planChartInstance.destroy();
+    }
+
+    if (plannedIncome === 0) {
+        legendEl.innerHTML = `
+            <div class="text-[10px] text-slate-400 font-light leading-snug">
+                ยังไม่ได้กำหนดเป้ารายรับประจำเดือนนี้ <br>
+                <span class="text-indigo-500 font-medium cursor-pointer" onclick="window.openIncomeGoalModal()">👉 คลิกเพื่อเริ่มตั้งเป้า</span>
+            </div>
+        `;
+        // วาดวงกลมเปล่าสีเทา
+        state.planChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['ยังไม่ได้ตั้งเป้ารายรับ'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: ['#f1f5f9'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        return;
+    }
+
+    if (plannedSavings >= 0) {
+        // วางแผนสำเร็จ (รายรับพอจ่ายและมีเงินออม)
+        state.planChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['งบรายจ่าย', 'ออมตั้งเป้า'],
+                datasets: [{
+                    data: [totalPlannedExpense, plannedSavings],
+                    backgroundColor: ['#f43f5e', '#6366f1'],
+                    borderWidth: 1,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw || 0;
+                                const percent = Math.round((value / plannedIncome) * 100);
+                                return ` ${context.label}: ฿${value.toLocaleString()} (${percent}%)`;
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // สร้าง Legend
+        const expPercent = Math.round((totalPlannedExpense / plannedIncome) * 100);
+        const savePercent = Math.round((plannedSavings / plannedIncome) * 100);
+
+        legendEl.innerHTML = `
+            <div class="flex justify-between items-center text-[10px] text-slate-600">
+                <div class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span> <span>งบรายจ่าย</span></div>
+                <span class="font-medium">${expPercent}%</span>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-slate-600">
+                <div class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span> <span>ออมตั้งเป้า</span></div>
+                <span class="font-medium">${savePercent}%</span>
+            </div>
+            <p class="text-[9px] text-emerald-500 font-light mt-1.5"><i class="fa-solid fa-circle-check mr-0.5"></i>แผนดีเยี่ยม! คุณจะเก็บเงินได้ ${savePercent}% ของรายได้</p>
+        `;
+    } else {
+        // แผนล้มเหลว (งบรายจ่ายเกินเป้ารายรับ)
+        state.planChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['งบรายจ่ายเกินเป้ารายรับ'],
+                datasets: [{
+                    data: [totalPlannedExpense],
+                    backgroundColor: ['#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        legendEl.innerHTML = `
+            <div class="text-[10px] text-rose-500 font-semibold leading-tight">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>งบรายจ่ายสูงกว่ารายรับ!
+            </div>
+            <p class="text-[9px] text-slate-400 font-light mt-1">งบรายจ่ายทั้งหมดของคุณเกินเป้าหมายรายรับไปแล้วเป็นจำนวน ฿${Math.abs(plannedSavings).toLocaleString()}</p>
+            <p class="text-[9px] text-slate-400 font-light mt-0.5">กรุณาปรับลดงบประมาณหมวดหมู่ลงเพื่อความสมดุลการเงิน</p>
+        `;
+    }
 }
 
 // แสดงรายการธุรกรรมล่าสุดในหน้า Dashboard
@@ -706,6 +848,34 @@ function selectCategoryForFixed(catId, btnElement) {
     });
     btnElement.className = `btn-picker-fixed-cat flex-shrink-0 px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-700 rounded-full text-xs font-semibold flex items-center space-x-1.5 cursor-pointer transition-all`;
 }
+
+// ช่วยเปิดหน้าต่างแก้ไขหมวดหมู่จากรหัส ID
+window.openCategoryModalById = function(id) {
+    const cat = state.categories.find(c => c.id === id);
+    if (cat) {
+        window.openCategoryModal(cat);
+    }
+};
+
+// จัดการ Modal หน้าต่างตั้งเป้ารายรับรายเดือน
+window.openIncomeGoalModal = function() {
+    const modal = document.getElementById("income-goal-modal");
+    const sheet = modal.querySelector("div");
+    document.getElementById("income-goal-input").value = state.monthlyBudget?.income_goal || "";
+    modal.classList.remove("opacity-0", "pointer-events-none");
+    setTimeout(() => {
+        sheet.classList.remove("translate-y-full");
+    }, 50);
+};
+
+window.closeIncomeGoalModal = function() {
+    const modal = document.getElementById("income-goal-modal");
+    const sheet = modal.querySelector("div");
+    sheet.classList.add("translate-y-full");
+    setTimeout(() => {
+        modal.classList.add("opacity-0", "pointer-events-none");
+    }, 300);
+};
 
 // =========================================================================
 // ควบคุมหน้าจอและการเปิด/ปิด Modals (Navigation & Modal Sheets)
@@ -1147,6 +1317,24 @@ function setupEventListeners() {
                 await loadAllData();
             } catch (err) {
                 alert("ไม่สามารถบันทึกรายจ่ายประจำได้: " + err.message);
+            }
+        });
+    }
+
+    // --- 7. บันทึกเป้ารายรับรายเดือน (INCOME GOAL EVENTS) ---
+    const btnSaveIncomeGoal = document.getElementById("btn-save-income-goal");
+    if (btnSaveIncomeGoal) {
+        btnSaveIncomeGoal.addEventListener("click", async () => {
+            const val = document.getElementById("income-goal-input").value;
+            if (val === "" || parseFloat(val) < 0) {
+                return alert("กรุณากรอกตัวเลขเป้ารายรับที่ถูกต้อง");
+            }
+            try {
+                await upsertMonthlyBudget(state.selectedMonth, val);
+                window.closeIncomeGoalModal();
+                await loadAllData();
+            } catch (err) {
+                alert("บันทึกเป้ารายรับล้มเหลว: " + err.message);
             }
         });
     }

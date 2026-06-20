@@ -1,0 +1,11 @@
+{
+  "name": "expense-tracker-2user",
+  "version": "1.0.0",
+  "description": "2-User Separate Expense Tracker",
+  "main": "app.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "author": "Antigravity",
+  "license": "MIT"
+}

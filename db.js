@@ -328,3 +328,47 @@ export async function checkAndApplyFixedExpenses() {
 
     return newlyApplied;
 }
+
+// =========================================================================
+// 4. แผนเป้ารายรับรายเดือน (Monthly Budgets)
+// =========================================================================
+
+// ดึงข้อมูลเป้ารายรับสำหรับเดือนที่ระบุ
+export async function getMonthlyBudget(monthYear) {
+    const supabase = getClient();
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) return { income_goal: 0 };
+
+    const { data, error } = await supabase
+        .from('monthly_budgets')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('month_year', monthYear)
+        .maybeSingle();
+
+    if (error) throw error;
+    return data || { income_goal: 0 };
+}
+
+// เพิ่มหรืออัปเดตข้อมูลเป้ารายรับรายเดือน
+export async function upsertMonthlyBudget(monthYear, incomeGoal) {
+    const supabase = getClient();
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) throw new Error("Unauthorized");
+
+    const { data, error } = await supabase
+        .from('monthly_budgets')
+        .upsert({
+            user_id: user.id,
+            month_year: monthYear,
+            income_goal: parseFloat(incomeGoal) || 0
+        }, {
+            onConflict: 'user_id,month_year'
+        })
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+

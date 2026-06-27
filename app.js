@@ -169,7 +169,6 @@ function renderDashboard() {
     }
 
     renderExpenseChart();
-    renderDashboardBudgets();
     renderRecentTransactions();
 }
 

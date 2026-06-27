@@ -312,6 +312,108 @@ export async function getMonthlyBudget(monthYear) {
     return data || { income_goal: 0 };
 }
 
+// แก้ไขรายการธุรกรรม
+export async function updateTransaction(id, { amount, type, categoryId, note, date, paymentMethod }) {
+    const supabase = getClient();
+    const { data, error } = await supabase
+        .from('transactions')
+        .update({
+            amount: parseFloat(amount),
+            type,
+            category_id: type === 'expense' ? categoryId : null,
+            note: note || '',
+            date: date || new Date().toISOString().split('T')[0],
+            payment_method: paymentMethod || 'cash'
+        })
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+// แก้ไขรายจ่ายประจำ
+export async function updateFixedExpense(id, { amount, type, categoryId, note, dayOfMonth, paymentMethod }) {
+    const supabase = getClient();
+    const { data, error } = await supabase
+        .from('fixed_expenses')
+        .update({
+            amount: parseFloat(amount),
+            type: type || 'expense',
+            category_id: type === 'expense' ? categoryId : null,
+            note: note || '',
+            day_of_month: parseInt(dayOfMonth),
+            payment_method: paymentMethod || 'cash'
+        })
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+// =========================================================================
+// 5. งบประมาณ (Budgets)
+// =========================================================================
+
+export async function getBudgets() {
+    const supabase = getClient();
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) return [];
+    const { data, error } = await supabase
+        .from('budgets')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+    if (error) throw error;
+    return data;
+}
+
+export async function createBudget({ name, amount, categoryId, color, showDaily }) {
+    const supabase = getClient();
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) throw new Error("Unauthorized");
+    const { data, error } = await supabase
+        .from('budgets')
+        .insert({
+            user_id: user.id,
+            name,
+            amount: parseFloat(amount),
+            category_id: categoryId || null,
+            color: color || 'rose-500',
+            show_daily: showDaily || false
+        })
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+export async function updateBudget(id, { name, amount, categoryId, color, showDaily }) {
+    const supabase = getClient();
+    const { data, error } = await supabase
+        .from('budgets')
+        .update({
+            name,
+            amount: parseFloat(amount),
+            category_id: categoryId || null,
+            color: color || 'rose-500',
+            show_daily: showDaily || false
+        })
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+export async function deleteBudget(id) {
+    const supabase = getClient();
+    const { error } = await supabase.from('budgets').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+}
+
 // เพิ่มหรืออัปเดตข้อมูลเป้ารายรับรายเดือน
 export async function upsertMonthlyBudget(monthYear, incomeGoal) {
     const supabase = getClient();

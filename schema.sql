@@ -128,3 +128,22 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =========================================================================
+-- 7. สร้างตาราง Budgets (งบประมาณแยกรายการ ไม่ผูกติดกับหมวดหมู่)
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS public.budgets (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+    name TEXT NOT NULL,
+    amount NUMERIC NOT NULL,
+    category_id UUID REFERENCES public.categories ON DELETE SET NULL,
+    color TEXT NOT NULL DEFAULT 'rose-500',
+    show_daily BOOLEAN DEFAULT false NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage their own budgets" ON public.budgets
+    FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);

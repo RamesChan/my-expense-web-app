@@ -16,24 +16,16 @@
         .page-content.active { display: flex; flex-direction: column; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        #screen-setup:not(.hidden),
-        #screen-auth:not(.hidden) {
-            display: flex !important;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        #screen-setup:not(.hidden), #screen-auth:not(.hidden) {
+            display: flex !important; flex-direction: column;
+            align-items: center; justify-content: center;
         }
         #screen-main:not(.hidden) {
-            display: flex !important;
-            flex-direction: column;
-            flex: 1;
-            height: 100%;
+            display: flex !important; flex-direction: column; flex: 1; height: 100%;
         }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-800 flex justify-center min-h-screen">
-
 <div id="app-container" class="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-hidden">
 
     <!-- ===================== SCREEN: SETUP ===================== -->
@@ -66,9 +58,7 @@
                     </button>
                 </form>
             </div>
-            <p class="text-center text-xs text-slate-600 font-light">
-                ข้อมูลจะถูกบันทึกลงฐานข้อมูลส่วนตัวของคุณบน Supabase
-            </p>
+            <p class="text-center text-xs text-slate-600 font-light">ข้อมูลจะถูกบันทึกลงฐานข้อมูลส่วนตัวของคุณบน Supabase</p>
         </div>
     </div>
 
@@ -81,7 +71,6 @@
                 <p class="text-slate-400 text-sm font-light">ระบบบันทึกรายรับรายจ่ายส่วนตัว</p>
             </div>
             <div class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
-                <!-- tab-login และ tab-signup ยังอยู่ใน DOM แต่ซ่อนไว้ เพราะ app.js อ้างอิงทั้งคู่ -->
                 <div class="hidden">
                     <button id="tab-login"></button>
                     <button id="tab-signup"></button>
@@ -110,8 +99,7 @@
                 </form>
             </div>
             <div class="text-center">
-                <button id="btn-change-config"
-                    class="text-xs text-slate-600 hover:text-slate-400 transition-all">
+                <button id="btn-change-config" class="text-xs text-slate-600 hover:text-slate-400 transition-all">
                     <i class="fa-solid fa-database mr-1"></i>เปลี่ยนการตั้งค่าฐานข้อมูล
                 </button>
             </div>
@@ -122,7 +110,7 @@
     <div id="screen-main" class="hidden bg-slate-50 relative">
 
         <!-- Sticky Header -->
-        <div class="px-5 pt-5 pb-4 bg-white sticky top-0 z-10 border-b border-slate-100">
+        <div class="px-5 pt-5 pb-4 bg-white sticky top-0 z-10 border-b border-slate-100 flex-shrink-0">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <span class="text-2xl">📅</span>
@@ -131,8 +119,12 @@
                     </select>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <button id="btn-toggle-visibility" onclick="window.toggleVisibility()"
+                        class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-eye text-sm"></i>
+                    </button>
                     <span id="user-pill"
-                        class="text-[11px] bg-indigo-50 border border-indigo-100 text-indigo-600 px-2.5 py-1 rounded-full font-medium truncate max-w-[130px]">
+                        class="text-[11px] bg-indigo-50 border border-indigo-100 text-indigo-600 px-2.5 py-1 rounded-full font-medium truncate max-w-[110px]">
                         👤 ผู้ใช้งาน
                     </span>
                     <button onclick="window.switchTab('settings')"
@@ -148,28 +140,19 @@
 
             <!-- Summary Card -->
             <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-5 text-white shadow-xl shadow-indigo-950/20 space-y-4">
-                <div class="flex justify-between items-center border-b border-white/10 pb-2">
-                    <p class="text-xs opacity-75 font-light">งบประมาณรวมคงเหลือ</p>
-                    <span id="dashboard-remaining-percent"
-                        class="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-medium">เหลือ 0%</span>
-                </div>
-                <div class="flex justify-between items-baseline">
-                    <p id="dashboard-remaining" class="text-3xl font-bold tracking-tight text-white">฿0</p>
-                    <p id="dashboard-budget-total" class="text-xs text-slate-400">จากงบ: ฿0</p>
-                </div>
-                <div class="w-full bg-white/10 rounded-full h-2">
-                    <div id="dashboard-progress-bar"
-                        class="bg-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 pt-1 text-xs font-light">
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/5">
-                        <span class="text-slate-400 block mb-0.5">รายรับรวม (เดือนนี้)</span>
-                        <span id="dashboard-income" class="text-sm font-semibold text-emerald-400">+฿0.00</span>
+                <div class="grid grid-cols-2 gap-3 text-xs font-light">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
+                        <span class="text-slate-400 block">รายรับรวม (เดือนนี้)</span>
+                        <span id="dashboard-income" class="text-base font-semibold text-emerald-400">+฿0.00</span>
                     </div>
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/5">
-                        <span class="text-slate-400 block mb-0.5">ใช้จ่ายจริง (เดือนนี้)</span>
-                        <span id="dashboard-expenses" class="text-sm font-semibold text-rose-400">-฿0.00</span>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
+                        <span class="text-slate-400 block">รายจ่ายรวม (เดือนนี้)</span>
+                        <span id="dashboard-expenses" class="text-base font-semibold text-rose-400">-฿0.00</span>
                     </div>
+                </div>
+                <div class="border-t border-white/10 pt-3 flex justify-between items-baseline">
+                    <p class="text-xs text-slate-400 font-light">คงเหลือสุทธิ</p>
+                    <span id="dashboard-balance" class="text-2xl font-bold tracking-tight">฿0.00</span>
                 </div>
             </div>
 
@@ -179,103 +162,123 @@
                     <i class="fa-solid fa-chart-pie mr-1.5"></i>สัดส่วนรายจ่ายรายหมวดหมู่
                 </h3>
                 <div class="flex items-center justify-between space-x-2">
-                    <div class="w-28 h-28 flex-shrink-0 relative">
+                    <div class="w-28 h-28 flex-shrink-0">
                         <canvas id="expenseChart" class="w-full h-full"></canvas>
                     </div>
-                    <div id="chart-legend"
-                        class="text-xs space-y-2 flex-1 pl-4 max-h-[120px] overflow-y-auto no-scrollbar"></div>
+                    <div id="chart-legend" class="text-xs space-y-2 flex-1 pl-4 max-h-[120px] overflow-y-auto no-scrollbar"></div>
                 </div>
             </div>
 
-            <!-- Plan Section -->
-            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-bullseye mr-1.5"></i>แผนการเงินประจำเดือน
-                    </h3>
-                    <button onclick="window.openIncomeGoalModal()"
-                        class="text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg font-medium transition-all active:scale-95">
-                        ตั้งเป้ารายรับ
-                    </button>
-                </div>
-                <div class="flex items-start space-x-3">
-                    <div class="w-24 h-24 flex-shrink-0">
-                        <canvas id="planChart" class="w-full h-full"></canvas>
-                    </div>
-                    <div class="flex-1 min-w-0 space-y-2">
-                        <div id="plan-chart-legend" class="space-y-1.5"></div>
-                        <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-50">
-                            <div class="text-center">
-                                <p class="text-[10px] text-slate-400 leading-tight">รายรับ<br>ตั้งเป้า</p>
-                                <p id="plan-income-val" class="text-xs font-bold text-emerald-500 mt-0.5">฿0</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[10px] text-slate-400 leading-tight">งบ<br>รายจ่าย</p>
-                                <p id="plan-expense-val" class="text-xs font-bold text-rose-500 mt-0.5">฿0</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-[10px] text-slate-400 leading-tight">เงินออม<br>ตั้งเป้า</p>
-                                <p id="plan-savings-val" class="text-xs font-bold text-indigo-600 mt-0.5">฿0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category Budgets -->
+            <!-- Budget Cards on Dashboard -->
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-tags mr-1.5"></i>งบประมาณรายหมวดหมู่
+                        <i class="fa-solid fa-bullseye mr-1.5"></i>งบประมาณ
                     </h3>
                     <button onclick="window.switchTab('budgets')"
                         class="text-xs text-indigo-600 font-medium hover:underline">จัดการ →</button>
                 </div>
-                <div id="dashboard-categories-list" class="space-y-2"></div>
+                <div id="dashboard-budgets-list" class="space-y-2"></div>
             </div>
 
             <!-- Recent Transactions -->
             <div class="space-y-3">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    <i class="fa-solid fa-clock-rotate-left mr-1.5"></i>รายการธุรกรรม (เดือนนี้)
-                </h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        <i class="fa-solid fa-clock-rotate-left mr-1.5"></i>รายการธุรกรรม (เดือนนี้)
+                    </h3>
+                    <button id="btn-batch-toggle-dashboard" onclick="window.toggleBatchMode('dashboard')"
+                        class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-medium transition-all">
+                        เลือก
+                    </button>
+                </div>
+                <!-- Batch Controls -->
+                <div id="batch-ctrl-dashboard" class="hidden bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 flex items-center justify-between">
+                    <label class="flex items-center space-x-2 text-xs font-medium text-amber-700 cursor-pointer">
+                        <input type="checkbox" id="chk-all-dashboard" class="rounded">
+                        <span>เลือกทั้งหมด</span>
+                    </label>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="window.deleteSelected('dashboard')"
+                            class="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-lg font-medium">ลบที่เลือก</button>
+                        <button onclick="window.toggleBatchMode('dashboard')"
+                            class="text-xs text-slate-500 px-2">ยกเลิก</button>
+                    </div>
+                </div>
                 <div id="dashboard-transactions-list" class="space-y-2"></div>
             </div>
-
         </div>
 
-        <!-- ===== PAGE: FIXED EXPENSES ===== -->
+        <!-- ===== PAGE: FIXED (RECURRING) ===== -->
         <div id="page-fixed" class="page-content px-5 py-4 space-y-4 flex-1 overflow-y-auto pb-24">
             <div class="flex justify-between items-center">
                 <div>
                     <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-calendar-days mr-1.5"></i>รายการรายจ่ายประจำ
+                        <i class="fa-solid fa-calendar-days mr-1.5"></i>รายการประจำ
                     </h3>
                     <p class="text-[11px] text-slate-400 font-light mt-0.5">ระบบจะตัดยอดให้อัตโนมัติทุกเดือน</p>
                 </div>
-                <button onclick="window.openFixedModal()"
-                    class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl font-medium transition-all active:scale-95">
-                    + เพิ่มรายการ
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button id="btn-batch-toggle-fixed" onclick="window.toggleBatchMode('fixed')"
+                        class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-medium transition-all">
+                        เลือก
+                    </button>
+                    <button onclick="window.openRecurringModal()"
+                        class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl font-medium transition-all active:scale-95">
+                        + เพิ่มรายการ
+                    </button>
+                </div>
             </div>
-            <div id="fixed-expenses-list" class="space-y-3"></div>
+            <!-- Batch Controls -->
+            <div id="batch-ctrl-fixed" class="hidden bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 flex items-center justify-between">
+                <label class="flex items-center space-x-2 text-xs font-medium text-amber-700 cursor-pointer">
+                    <input type="checkbox" id="chk-all-fixed" class="rounded">
+                    <span>เลือกทั้งหมด</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.deleteSelected('fixed')"
+                        class="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-lg font-medium">ลบที่เลือก</button>
+                    <button onclick="window.toggleBatchMode('fixed')"
+                        class="text-xs text-slate-500 px-2">ยกเลิก</button>
+                </div>
+            </div>
+            <div id="recurring-list" class="space-y-3"></div>
         </div>
 
-        <!-- ===== PAGE: CATEGORIES / BUDGETS ===== -->
+        <!-- ===== PAGE: BUDGETS ===== -->
         <div id="page-budgets" class="page-content px-5 py-4 space-y-4 flex-1 overflow-y-auto pb-24">
             <div class="flex justify-between items-center">
                 <div>
                     <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-tags mr-1.5"></i>หมวดหมู่รายจ่าย
+                        <i class="fa-solid fa-bullseye mr-1.5"></i>กำหนดงบประมาณ
                     </h3>
-                    <p class="text-[11px] text-slate-400 font-light mt-0.5">แตะที่การ์ดเพื่อแก้ไขหรือกำหนดงบประมาณ</p>
+                    <p class="text-[11px] text-slate-400 font-light mt-0.5">แตะที่การ์ดเพื่อแก้ไข</p>
                 </div>
-                <button onclick="window.openCategoryModal()"
-                    class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl font-medium transition-all active:scale-95">
-                    + เพิ่มหมวดหมู่
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button id="btn-batch-toggle-budgets" onclick="window.toggleBatchMode('budgets')"
+                        class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg font-medium transition-all">
+                        เลือก
+                    </button>
+                    <button onclick="window.openBudgetModal()"
+                        class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl font-medium transition-all active:scale-95">
+                        + เพิ่มงบ
+                    </button>
+                </div>
             </div>
-            <div id="categories-grid" class="grid grid-cols-2 gap-3"></div>
+            <!-- Batch Controls -->
+            <div id="batch-ctrl-budgets" class="hidden bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 flex items-center justify-between">
+                <label class="flex items-center space-x-2 text-xs font-medium text-amber-700 cursor-pointer">
+                    <input type="checkbox" id="chk-all-budgets" class="rounded">
+                    <span>เลือกทั้งหมด</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.deleteSelected('budgets')"
+                        class="text-xs text-rose-600 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-lg font-medium">ลบที่เลือก</button>
+                    <button onclick="window.toggleBatchMode('budgets')"
+                        class="text-xs text-slate-500 px-2">ยกเลิก</button>
+                </div>
+            </div>
+            <div id="budgets-list" class="space-y-3"></div>
         </div>
 
         <!-- ===== PAGE: SETTINGS ===== -->
@@ -283,7 +286,6 @@
             <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 <i class="fa-solid fa-user-gear mr-1.5"></i>การตั้งค่า
             </h3>
-
             <!-- Profile Card -->
             <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm text-center space-y-4">
                 <div id="profile-avatar"
@@ -295,12 +297,9 @@
                     <p id="profile-email" class="text-xs text-slate-400 mt-0.5">-</p>
                 </div>
             </div>
-
             <!-- Edit Display Name -->
             <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-                <h4 class="text-xs font-semibold text-slate-500">
-                    <i class="fa-solid fa-pen mr-1"></i>แก้ไขชื่อที่แสดง
-                </h4>
+                <h4 class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-pen mr-1"></i>แก้ไขชื่อที่แสดง</h4>
                 <input id="settings-display-name" type="text" placeholder="ชื่อของคุณ"
                     class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
                 <button id="btn-save-profile"
@@ -308,12 +307,9 @@
                     บันทึกชื่อ
                 </button>
             </div>
-
             <!-- DB Info -->
             <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-                <h4 class="text-xs font-semibold text-slate-500">
-                    <i class="fa-solid fa-database mr-1"></i>ข้อมูลฐานข้อมูล
-                </h4>
+                <h4 class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-database mr-1"></i>ข้อมูลฐานข้อมูล</h4>
                 <div class="bg-slate-50 p-3 rounded-xl">
                     <p class="text-[10px] text-slate-400 font-medium mb-0.5">Supabase URL</p>
                     <p id="settings-db-url" class="text-xs text-slate-600 break-all font-mono">ไม่ได้ระบุ</p>
@@ -323,7 +319,6 @@
                     <i class="fa-solid fa-arrows-rotate mr-1"></i> เปลี่ยนฐานข้อมูล
                 </button>
             </div>
-
             <!-- Logout -->
             <button id="btn-logout"
                 class="w-full text-center text-xs text-rose-500 border border-rose-100 bg-rose-50/50 py-2.5 rounded-xl font-medium hover:bg-rose-100/50 transition-all active:scale-95">
@@ -343,13 +338,13 @@
                 <i class="fa-solid fa-calendar-days text-lg"></i>
                 <span class="text-[10px] font-medium">รายการประจำ</span>
             </button>
-            <button onclick="window.toggleModal(true)"
+            <button onclick="window.openTransactionModal()"
                 class="w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xl shadow-lg shadow-indigo-300 -translate-y-4 hover:bg-indigo-700 transition-all active:scale-95">
                 <i class="fa-solid fa-plus"></i>
             </button>
             <button onclick="window.switchTab('budgets')" id="nav-budgets"
                 class="nav-btn flex flex-col items-center space-y-0.5 text-slate-400 hover:text-slate-600 w-16">
-                <i class="fa-solid fa-tags text-lg"></i>
+                <i class="fa-solid fa-bullseye text-lg"></i>
                 <span class="text-[10px] font-medium">กำหนดงบ</span>
             </button>
             <button onclick="window.switchTab('settings')" id="nav-settings"
@@ -358,17 +353,16 @@
                 <span class="text-[10px] font-medium">ตั้งค่า</span>
             </button>
         </div>
-
     </div>
     <!-- end screen-main -->
 
     <!-- ===================== MODAL: บันทึกรายการ ===================== -->
     <div id="expense-modal"
         class="fixed inset-0 bg-black/40 z-30 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <button onclick="window.toggleModal(false)" class="text-slate-400 text-sm">ยกเลิก</button>
-                <h3 class="font-semibold text-slate-800">บันทึกรายการเงิน</h3>
+                <button onclick="window.closeTransactionModal()" class="text-slate-400 text-sm">ยกเลิก</button>
+                <h3 id="tx-modal-title" class="font-semibold text-slate-800">บันทึกรายการเงิน</h3>
                 <button id="btn-save-transaction" class="text-indigo-600 font-medium text-sm">บันทึก</button>
             </div>
             <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200/50">
@@ -410,6 +404,124 @@
                     </div>
                 </div>
             </div>
+            <button id="btn-delete-tx-modal"
+                class="hidden w-full py-2.5 bg-rose-50 border border-rose-100 text-rose-500 text-xs font-medium rounded-xl transition-all active:scale-95">
+                <i class="fa-solid fa-trash mr-1.5"></i> ลบรายการนี้
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL: รายการประจำ ===================== -->
+    <div id="recurring-modal"
+        class="fixed inset-0 bg-black/40 z-30 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <button onclick="window.closeRecurringModal()" class="text-slate-400 text-sm">ยกเลิก</button>
+                <h3 id="recurring-modal-title" class="font-semibold text-slate-800">เพิ่มรายการประจำ</h3>
+                <button id="btn-save-recurring" class="text-indigo-600 font-medium text-sm">บันทึก</button>
+            </div>
+            <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200/50">
+                <button type="button" id="rec-type-expense"
+                    class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all">
+                    รายจ่าย
+                </button>
+                <button type="button" id="rec-type-income"
+                    class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 transition-all">
+                    รายรับ
+                </button>
+            </div>
+            <div class="text-center py-2">
+                <span class="text-xs text-slate-400 block mb-1">จำนวนเงิน (บาท)</span>
+                <input type="number" id="rec-amount" step="any" placeholder="0.00" required
+                    class="text-3xl font-bold text-center text-indigo-600 focus:outline-none w-full placeholder-indigo-200">
+            </div>
+            <div id="recurring-category-section" class="space-y-2">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">เลือกหมวดหมู่</label>
+                <div id="recurring-category-picker" class="flex space-x-2 overflow-x-auto pb-2 no-scrollbar"></div>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="rec-note" placeholder="โน้ต (เช่น ค่าเช่าห้อง, เงินเดือน)"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+                <div class="flex space-x-2">
+                    <div class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 flex flex-col justify-center">
+                        <label class="text-[10px] font-semibold text-slate-400 uppercase">ตัดยอดทุกวันที่ (1-31)</label>
+                        <input type="number" id="rec-day" min="1" max="31" placeholder="1" required
+                            class="w-full bg-transparent text-sm font-semibold text-slate-800 focus:outline-none mt-0.5">
+                    </div>
+                    <div class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600 flex items-center justify-between relative">
+                        <select id="rec-payment"
+                            class="w-full bg-transparent border-none focus:outline-none cursor-pointer pr-4 appearance-none">
+                            <option value="cash">💵 เงินสด</option>
+                            <option value="transfer">📱 โอนเงิน</option>
+                            <option value="credit">💳 บัตรเครดิต</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down text-[10px] absolute right-4 pointer-events-none text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+            <button id="btn-delete-rec-modal"
+                class="hidden w-full py-2.5 bg-rose-50 border border-rose-100 text-rose-500 text-xs font-medium rounded-xl transition-all active:scale-95">
+                <i class="fa-solid fa-trash mr-1.5"></i> ลบรายการประจำนี้
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL: กำหนดงบ ===================== -->
+    <div id="budget-modal"
+        class="fixed inset-0 bg-black/40 z-30 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <button onclick="window.closeBudgetModal()" class="text-slate-400 text-sm">ยกเลิก</button>
+                <h3 id="budget-modal-title" class="font-semibold text-slate-800">เพิ่มงบประมาณ</h3>
+                <button id="btn-save-budget" class="text-indigo-600 font-medium text-sm">บันทึก</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">ชื่องบประมาณ</label>
+                    <input type="text" id="bg-name" placeholder="เช่น งบอาหาร, งบเดินทาง"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">จำนวนงบ (บาท)</label>
+                    <input type="number" id="bg-amount" step="any" placeholder="0.00"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-semibold text-indigo-600 focus:outline-none focus:border-indigo-400">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">หมวดหมู่ (ไม่บังคับ)</label>
+                    <div id="budget-category-picker" class="flex space-x-2 overflow-x-auto pb-2 no-scrollbar"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-2">สี</label>
+                    <div class="grid grid-cols-6 gap-2">
+                        <button type="button" data-color="rose-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-rose-500 ring-2 ring-offset-2 ring-indigo-500"></button>
+                        <button type="button" data-color="blue-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-blue-500 ring-0 ring-offset-2 ring-indigo-500"></button>
+                        <button type="button" data-color="yellow-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-yellow-500 ring-0 ring-offset-2 ring-indigo-500"></button>
+                        <button type="button" data-color="purple-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-purple-500 ring-0 ring-offset-2 ring-indigo-500"></button>
+                        <button type="button" data-color="emerald-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-emerald-500 ring-0 ring-offset-2 ring-indigo-500"></button>
+                        <button type="button" data-color="indigo-500"
+                            class="bgcolor-dot w-8 h-8 rounded-full bg-indigo-500 ring-0 ring-offset-2 ring-indigo-500"></button>
+                    </div>
+                </div>
+                <label class="flex items-center justify-between cursor-pointer bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+                    <div>
+                        <span class="text-sm text-slate-700 font-medium">แสดงงบรายวัน</span>
+                        <p class="text-[10px] text-slate-400 font-light">คำนวณงบที่เหลือต่อวันตามจำนวนวันที่เหลือ</p>
+                    </div>
+                    <div class="relative flex-shrink-0 ml-3">
+                        <input type="checkbox" id="bg-show-daily" class="sr-only peer">
+                        <div class="w-10 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                    </div>
+                </label>
+                <button id="btn-delete-budget"
+                    class="hidden w-full py-2.5 bg-rose-50 border border-rose-100 text-rose-500 text-xs font-medium rounded-xl transition-all active:scale-95">
+                    <i class="fa-solid fa-trash mr-1.5"></i> ลบงบประมาณนี้
+                </button>
+            </div>
         </div>
     </div>
 
@@ -436,11 +548,6 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">งบประมาณรายเดือน (บาท)</label>
-                    <input type="number" id="cat-budget" placeholder="0 = ไม่กำหนด" min="0"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-                </div>
-                <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-2">สีหมวดหมู่</label>
                     <div class="grid grid-cols-6 gap-2">
                         <button type="button" data-color="rose-500"
@@ -461,71 +568,6 @@
                     class="hidden w-full py-3 bg-rose-50 text-rose-500 border border-rose-100 text-xs font-medium rounded-xl transition-all active:scale-95">
                     <i class="fa-solid fa-trash mr-1.5"></i> ลบหมวดหมู่นี้
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================== MODAL: รายจ่ายประจำ ===================== -->
-    <div id="fixed-modal"
-        class="fixed inset-0 bg-black/40 z-30 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <button onclick="window.closeFixedModal()" class="text-slate-400 text-sm">ยกเลิก</button>
-                <h3 class="font-semibold text-slate-800">เพิ่มรายจ่ายประจำ</h3>
-                <button id="btn-save-fixed" class="text-indigo-600 font-medium text-sm">บันทึก</button>
-            </div>
-            <div class="space-y-4">
-                <div class="text-center py-2">
-                    <span class="text-xs text-slate-400 block mb-1">จำนวนเงิน (บาท)</span>
-                    <input type="number" id="fixed-amount" step="any" placeholder="0.00" required
-                        class="text-3xl font-bold text-center text-indigo-600 focus:outline-none w-full placeholder-indigo-200">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">เลือกหมวดหมู่</label>
-                    <div id="fixed-category-picker" class="flex space-x-2 overflow-x-auto pb-2 no-scrollbar"></div>
-                </div>
-                <div class="space-y-3">
-                    <input type="text" id="fixed-note" placeholder="โน้ต (เช่น ค่าเช่าห้อง, ค่าอินเทอร์เน็ต)"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-                    <div class="flex space-x-2">
-                        <div class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 flex flex-col justify-center">
-                            <label class="text-[10px] font-semibold text-slate-400 uppercase">ตัดยอดทุกวันที่ (1-31)</label>
-                            <input type="number" id="fixed-day" min="1" max="31" placeholder="1" required
-                                class="w-full bg-transparent text-sm font-semibold text-slate-800 focus:outline-none mt-0.5">
-                        </div>
-                        <div class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-600 flex items-center justify-between relative">
-                            <select id="fixed-payment"
-                                class="w-full bg-transparent border-none focus:outline-none cursor-pointer pr-4 appearance-none">
-                                <option value="cash">💵 เงินสด</option>
-                                <option value="transfer">📱 โอนเงิน</option>
-                                <option value="credit">💳 บัตรเครดิต</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down text-[10px] absolute right-4 pointer-events-none text-slate-400"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================== MODAL: ตั้งเป้ารายรับ ===================== -->
-    <div id="income-goal-modal"
-        class="fixed inset-0 bg-black/40 z-30 flex items-end justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white w-full max-w-md rounded-t-2xl p-6 space-y-5 transform translate-y-full transition-transform duration-300">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <button onclick="window.closeIncomeGoalModal()" class="text-slate-400 text-sm">ยกเลิก</button>
-                <h3 class="font-semibold text-slate-800">ตั้งเป้ารายรับรายเดือน</h3>
-                <button id="btn-save-income-goal" class="text-indigo-600 font-medium text-sm">บันทึก</button>
-            </div>
-            <div class="space-y-4">
-                <p class="text-xs text-slate-400 font-light leading-relaxed">
-                    ระบุรายรับที่คาดไว้ในเดือนนี้ (เช่น เงินเดือน + รายได้พิเศษ) เพื่อคำนวณเงินออมตั้งเป้า
-                </p>
-                <div class="text-center py-2">
-                    <span class="text-xs text-slate-400 block mb-1">รายรับที่ตั้งเป้า (บาท)</span>
-                    <input type="number" id="income-goal-input" step="any" placeholder="0.00" min="0"
-                        class="text-3xl font-bold text-center text-indigo-600 focus:outline-none w-full placeholder-indigo-200">
-                </div>
             </div>
         </div>
     </div>

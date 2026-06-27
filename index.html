@@ -119,10 +119,6 @@
                     </select>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button id="btn-toggle-visibility" onclick="window.toggleVisibility()"
-                        class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-100 active:scale-95 transition-all">
-                        <i class="fa-solid fa-eye text-sm"></i>
-                    </button>
                     <span id="user-pill"
                         class="text-[11px] bg-indigo-50 border border-indigo-100 text-indigo-600 px-2.5 py-1 rounded-full font-medium truncate max-w-[110px]">
                         👤 ผู้ใช้งาน
@@ -150,8 +146,14 @@
                         <span id="dashboard-expenses" class="text-base font-semibold text-rose-400">-฿0.00</span>
                     </div>
                 </div>
-                <div class="border-t border-white/10 pt-3 flex justify-between items-baseline">
-                    <p class="text-xs text-slate-400 font-light">คงเหลือสุทธิ</p>
+                <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <p class="text-xs text-slate-400 font-light">คงเหลือสุทธิ</p>
+                        <button id="btn-toggle-visibility" onclick="window.toggleVisibility()"
+                            class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-slate-400 hover:bg-white/20 active:scale-95 transition-all">
+                            <i class="fa-solid fa-eye text-[10px]"></i>
+                        </button>
+                    </div>
                     <span id="dashboard-balance" class="text-2xl font-bold tracking-tight">฿0.00</span>
                 </div>
             </div>

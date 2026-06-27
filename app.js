@@ -148,6 +148,12 @@ function updateUserHeader() {
 // Rendering
 // =========================================================================
 function renderDashboard() {
+    updateSummaryAmounts();
+    renderExpenseChart();
+    renderRecentTransactions();
+}
+
+function updateSummaryAmounts() {
     let totalIncome = 0, totalExpenses = 0;
     state.transactions.forEach(tx => {
         const a = parseFloat(tx.amount);
@@ -155,21 +161,19 @@ function renderDashboard() {
     });
     const balance = totalIncome - totalExpenses;
 
-    const fmt = (v, prefix = '') => state.amountsVisible
-        ? `${prefix}฿${Math.abs(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : `${prefix}฿****`;
+    const fmt2 = (v) => state.amountsVisible
+        ? `฿${Math.abs(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : `฿****`;
 
-    const el = (id) => document.getElementById(id);
-    el("dashboard-income").textContent = fmt(totalIncome, '+');
-    el("dashboard-expenses").textContent = fmt(totalExpenses, '-');
-    const balEl = el("dashboard-balance");
+    const incEl = document.getElementById('dashboard-income');
+    const expEl = document.getElementById('dashboard-expenses');
+    const balEl = document.getElementById('dashboard-balance');
+    if (incEl) incEl.textContent = '+' + fmt2(totalIncome);
+    if (expEl) expEl.textContent = '-' + fmt2(totalExpenses);
     if (balEl) {
-        balEl.textContent = fmt(balance);
+        balEl.textContent = fmt2(balance);
         balEl.className = `text-2xl font-bold tracking-tight ${balance < 0 ? 'text-rose-400' : 'text-white'}`;
     }
-
-    renderExpenseChart();
-    renderRecentTransactions();
 }
 
 function renderExpenseChart() {
@@ -235,7 +239,7 @@ function renderExpenseChart() {
                 <span class="truncate">${item.icon} ${label}</span>
             </div>
             <div class="font-medium text-right flex-shrink-0">
-                <span>${state.amountsVisible ? '฿' + Math.round(item.amount).toLocaleString() : '฿****'}</span>
+                <span>฿${Math.round(item.amount).toLocaleString()}</span>
                 <span class="text-slate-400 ml-1 font-light">(${percent}%)</span>
             </div>
         `;
@@ -331,9 +335,7 @@ function renderRecentTransactions() {
         const dateObj = new Date(tx.date + 'T00:00:00');
         const dateStr = `${dateObj.getDate()} ${shortMonths[dateObj.getMonth()]}`;
         const payLabel = tx.payment_method === 'cash' ? 'เงินสด' : tx.payment_method === 'transfer' ? 'โอนเงิน' : 'บัตรเครดิต';
-        const amtText = state.amountsVisible
-            ? `${isIncome ? '+' : '-'}฿${parseFloat(tx.amount).toLocaleString('th-TH', { minimumFractionDigits: 2 })}`
-            : `${isIncome ? '+' : '-'}฿****`;
+        const amtText = `${isIncome ? '+' : '-'}฿${parseFloat(tx.amount).toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
 
         const item = document.createElement("div");
         item.className = "bg-white p-3 rounded-xl border border-slate-100 flex items-center group hover:bg-slate-50 transition-all";
@@ -390,7 +392,7 @@ function renderRecurringPage() {
     state.recurring.forEach(item => {
         const isIncome = item.type === 'income';
         const cat = item.category_id ? state.categories.find(c => c.id === item.category_id) : null;
-        const amtText = state.amountsVisible ? `฿${parseFloat(item.amount).toLocaleString()}` : `฿****`;
+        const amtText = `฿${parseFloat(item.amount).toLocaleString()}`;
 
         const row = document.createElement("div");
         row.className = "bg-white p-4 rounded-xl border border-slate-100 flex items-center group hover:bg-slate-50 transition-all cursor-pointer";
@@ -480,15 +482,15 @@ function renderBudgetsPage() {
                             </div>
                         </div>
                         <div class="text-right flex-shrink-0 ml-2">
-                            <p class="text-sm font-bold ${isOver ? 'text-rose-600' : 'text-slate-800'}">${state.amountsVisible ? '฿' + spent.toLocaleString('th-TH', {minimumFractionDigits: 0}) : '฿****'}</p>
-                            <p class="text-[10px] text-slate-400">จาก ${state.amountsVisible ? '฿' + amount.toLocaleString() : '฿****'}</p>
+                            <p class="text-sm font-bold ${isOver ? 'text-rose-600' : 'text-slate-800'}">฿${spent.toLocaleString('th-TH', {minimumFractionDigits: 0})}</p>
+                            <p class="text-[10px] text-slate-400">จาก ฿${amount.toLocaleString()}</p>
                         </div>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-1.5 mb-1">
                         <div class="bg-${isOver ? 'rose' : colorBase}-500 h-1.5 rounded-full" style="width:${percent}%"></div>
                     </div>
                     <div class="flex justify-between items-center text-[10px]">
-                        <span class="${isOver ? 'text-rose-500 font-medium' : 'text-slate-400'}">${isOver ? '⚠️ เกินงบ' : `เหลือ ${state.amountsVisible ? '฿' + remaining.toLocaleString() : '฿****'}`}</span>
+                        <span class="${isOver ? 'text-rose-500 font-medium' : 'text-slate-400'}">${isOver ? '⚠️ เกินงบ' : `เหลือ ฿${remaining.toLocaleString()}`}</span>
                         <span class="text-slate-400">${percent}%</span>
                     </div>
                 </div>
@@ -541,12 +543,10 @@ window.toggleVisibility = function() {
     const btn = document.getElementById("btn-toggle-visibility");
     if (btn) {
         btn.innerHTML = state.amountsVisible
-            ? '<i class="fa-solid fa-eye text-sm"></i>'
-            : '<i class="fa-solid fa-eye-slash text-sm text-slate-300"></i>';
+            ? '<i class="fa-solid fa-eye text-[10px]"></i>'
+            : '<i class="fa-solid fa-eye-slash text-[10px] text-slate-300"></i>';
     }
-    renderDashboard();
-    renderRecurringPage();
-    renderBudgetsPage();
+    updateSummaryAmounts();
 };
 
 // =========================================================================

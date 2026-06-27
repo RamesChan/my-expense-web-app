@@ -163,7 +163,7 @@ function updateSummaryAmounts() {
 
     const fmt2 = (v) => state.amountsVisible
         ? `฿${Math.abs(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-        : `฿****`;
+        : `฿ • • • •`;
 
     const incEl = document.getElementById('dashboard-income');
     const expEl = document.getElementById('dashboard-expenses');

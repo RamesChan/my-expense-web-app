@@ -81,16 +81,12 @@
                 <p class="text-slate-400 text-sm font-light">ระบบบันทึกรายรับรายจ่ายส่วนตัว</p>
             </div>
             <div class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
-                <div class="flex bg-white/10 rounded-xl p-1">
-                    <button id="tab-login"
-                        class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white/10 text-white transition-all">
-                        เข้าสู่ระบบ
-                    </button>
-                    <button id="tab-signup"
-                        class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">
-                        สมัครสมาชิก
-                    </button>
+                <!-- tab-login และ tab-signup ยังอยู่ใน DOM แต่ซ่อนไว้ เพราะ app.js อ้างอิงทั้งคู่ -->
+                <div class="hidden">
+                    <button id="tab-login"></button>
+                    <button id="tab-signup"></button>
                 </div>
+                <p class="text-center text-white font-semibold text-sm">เข้าสู่ระบบ</p>
                 <form id="form-auth" class="space-y-4">
                     <div id="group-display-name" class="hidden space-y-1.5">
                         <label class="text-xs text-slate-400 font-medium">ชื่อที่แสดง</label>
